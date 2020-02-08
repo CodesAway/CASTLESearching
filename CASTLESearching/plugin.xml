@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="info.codesaway.castlesearching"
+            name="CASTLE Searching">
+      </category>
+      <view
+            category="info.codesaway.castlesearching"
+            class="info.codesaway.castlesearching.CASTLESearchingView"
+            icon="icons/CASTLE.png"
+            id="info.codesaway.castlesearching.CASTLESearchingView"
+            name="CASTLE Searching">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.search.searchPages">
+      <page
+            class="info.codesaway.castlesearching.CASTLESearchingPage"
+            icon="icons/CASTLE.png"
+            id="info.codesaway.castlesearching.CASTLESearchingPage"
+            label="CASTLE Searching"
+            tabPosition="0">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="info.codesaway.castlesearching.commands.category"
+            name="CASTLE Searching">
+      </category>
+      <command
+            categoryId="info.codesaway.castlesearching.commands.category"
+            defaultHandler="info.codesaway.castlesearching.handlers.SearchHandler"
+            id="info.codesaway.castlesearching.commands.incrementalfind"
+            name="Incremental Find">
+            	<state
+         			class="org.eclipse.ui.handlers.RegistryToggleState:false"
+         			id="org.eclipse.ui.commands.toggleState">
+   				</state>
+      </command>
+      <command
+            categoryId="info.codesaway.castlesearching.commands.category"
+            defaultHandler="info.codesaway.castlesearching.handlers.SearchHandler"
+            id="info.codesaway.castlesearching.commands.operatorand"
+            name="Operator AND">
+        		<state
+         			class="org.eclipse.ui.handlers.RegistryToggleState:true"
+         			id="org.eclipse.ui.commands.toggleState">
+   				</state>
+      </command>
+      <command
+            categoryId="info.codesaway.castlesearching.commands.category"
+            defaultHandler="info.codesaway.castlesearching.handlers.SearchHandler"
+            id="info.codesaway.castlesearching.commands.includecomments"
+            name="Include Comments">
+        		<state
+         			class="org.eclipse.ui.handlers.RegistryToggleState:false"
+         			id="org.eclipse.ui.commands.toggleState">
+   				</state>
+      </command>
+      <command
+            categoryId="info.codesaway.castlesearching.commands.category"
+            defaultHandler="info.codesaway.castlesearching.handlers.RebuildIndexHandler"
+            id="info.codesaway.castlesearching.commands.rebuildindex"
+            name="Rebuild Index">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:false"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <!--<extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="info.codesaway.castlesearching.handlers.SearchHandler"
+            commandId="info.codesaway.castlesearching.commands.operatorand">
+      </handler>
+   </extension>-->
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:info.codesaway.castlesearching.CASTLESearchingView">
+         <command
+               commandId="info.codesaway.castlesearching.commands.incrementalfind"
+               icon="icons/IncrementalFind.png"
+               label="Incremental Find"
+               style="toggle"
+               tooltip="Incremental Find (ALT + `, same key as ~)">
+         </command>
+         <command
+               commandId="info.codesaway.castlesearching.commands.operatorand"
+               icon="icons/OperatorAND.png"
+               label="Default to AND terms"
+               style="toggle"
+               tooltip="Default to AND terms together instead of OR (ALT + =, same key as +)">
+         </command>
+         <command
+               commandId="info.codesaway.castlesearching.commands.includecomments"
+               icon="icons/IncludeComments.png"
+               label="Include Comments"
+               style="toggle"
+               tooltip="Include comments in search results (ALT + /)">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:info.codesaway.castlesearching.CASTLESearchingView">
+         <command
+               commandId="info.codesaway.castlesearching.commands.rebuildindex"
+               label="Rebuild Index"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+</plugin>
