@@ -1,6 +1,6 @@
 ![CASTLE Searching](http://codesaway.info/images/CASTLESearching.png)
 
-# CASTLESearching
+# CASTLE Searching
 CASTLE Searching is an Eclipse plugin, which allows you to find what you're looking for faster.
 http://codesaway.info/CASTLESearching/
 
