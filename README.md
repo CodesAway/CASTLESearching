@@ -1,7 +1,27 @@
+![CASTLE Searching](http://codesaway.info/images/CASTLESearching.png)
+
 # CASTLESearching
 CASTLE Searching is an Eclipse plugin, which allows you to find what you're looking for faster.
 http://codesaway.info/CASTLESearching/
 
+## What is CASTLE Searching?
+CASTLE Searching is a **C**ode **A**nalyzer **S**earch **T**ool **L**ooking @ **E**verything Searching
+
+## How does it work?
+
+In short, magic.
+
+### Details
+CASTLE Searching uses Apache Lucene to index your workspace files. It creates an index, like found in a book, so you can easily find related code based on searching by key phrases.
+
+* Identifies key phases by breaking up camelCase, PascalCase, snake_case / SNAKE_CASE, and kebab-case phrases into their individual parts, such as "camel" and "case"
+* Makes use of some Lucene functionality to search for the various word forms such as compare, compararing, comparison, and comparator.
+* Indexes each line of code and stores metadata such as the Eclipse project, pathname, filename, extension, and line number
+* Uses Lucene to handle case-insensitive user-specified "synonyms" / abbreviations and case-sensitive "acronyms"
+
+This allows doing complex filtering with a simple query.
+
+## Installation
 1. Open Eclipse and under the **Help** menu, select **Install New Software...**
 2. Click **Add...** to add a new site
    * Stable
