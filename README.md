@@ -4,6 +4,16 @@
 CASTLE Searching is an Eclipse plugin, which allows you to find what you're looking for faster.
 http://codesaway.info/CASTLESearching/
 
+## Update site
+
+### Stable
+* **Name**: CASTLE Searching
+* **Location**: http://codesaway.info/CASTLESearching/eclipse
+
+### Beta
+* **Name**: CASTLE Searching (beta)
+* **Location**: http://codesaway.info/CASTLESearching/eclipse-beta
+
 ## What is CASTLE Searching?
 CASTLE Searching is a **C**ode **A**nalyzer **S**earch **T**ool **L**ooking @ **E**verything Searching
 
@@ -26,11 +36,11 @@ This allows doing complex filtering with a simple query.
 2. Click **Add...** to add a new site
    * Stable
       * **Name**: CASTLE Searching
-      * **Location**: codesaway.info/CASTLESearching/eclipse
+      * **Location**: http://codesaway.info/CASTLESearching/eclipse
       * Click **Add**
    * Beta
       * **Name**: CASTLE Searching (beta)
-      * **Location**: codesaway.info/CASTLESearching/eclipse-beta
+      * **Location**: http://codesaway.info/CASTLESearching/eclipse-beta
       * Click **Add**
 3. Check the box next to CASTLE Searching to install the plugin
 4. Click **Next**
