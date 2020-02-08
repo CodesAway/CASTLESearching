@@ -1,2 +1,24 @@
 # CASTLESearching
 CASTLE Searching is an Eclipse plugin, which allows you to find what you're looking for faster.
+http://codesaway.info/CASTLESearching/
+
+1. Open Eclipse and under the **Help** menu, select **Install New Software...**
+2. Click **Add...** to add a new site
+   * Stable
+      * **Name**: CASTLE Searching
+      * **Location**: codesaway.info/CASTLESearching/eclipse
+      * Click **Add**
+   * Beta
+      * **Name**: CASTLE Searching (beta)
+      * **Location**: codesaway.info/CASTLESearching/eclipse-beta
+      * Click **Add**
+3. Check the box next to CASTLE Searching to install the plugin
+4. Click **Next**
+5. Accept the license agreement and click **Finish**
+6. When prompted, install the plugin even though it's not digitally signed
+7. Restart Eclipse when asked
+8. Start CASTLE Searching! ![CASTLE Searching](http://codesaway.info/images/CASTLE.png)
+   * In Eclipse, go to the search page (under the **Search** menu -> **Search...**) and CASTLE Searching will now be the first tab
+   * You can also open the view under **Window** -> **Show View** -> **Other...**
+   * This shows the CASTLE Searching view, where you can search and the results will be shown immediately
+   * **NOTE**: The first time you run the plugin, it will index your workspace. This may take some time depending on the size of your code base, but you'll be able to start searching quickly even as it continues indexing.
