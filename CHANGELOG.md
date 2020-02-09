@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2020-01-21
 ### Added
 * Support for custom searchers (to allow searching already existing indexes created outside of CASTLE Searching)
-* settings.xml file in plugin directory [workspace]\.metadata\.plugins\info.codesaway.castlesearching
+* settings.xml file in plugin directory **[workspace]**\\.metadata\\.plugins\info.codesaway.castlesearching
 
 ## [1.1.0] - 2020-01-12
 ### Added
