@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.0] - 2020-02-06
 ### Added
 * CASTLE Searching was made open source, available on GitHub
-* View Toolbar toggle command to exclude comments from search results
+* Option to exclude comments from search results (View Toolbar toggle command)
   * Reqires rebuild of index to use new functionality
   * Can always opt to not reindex (will use the new format as files are modified)
 * View Menu command to rebuild entire index
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.0] - 2020-02-02
 ### Added
-* View Toolbar toggle command to require each term by default
+* Option to require each term by default (View Toolbar toggle command)
 * Monitor settings file and reload file if changed
 * View Toolbar toggle commands for each setting
 
