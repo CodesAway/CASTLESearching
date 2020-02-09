@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Can always opt to not reindex (will use the new format as files are modified)
 * View Menu command to rebuild entire index
 * New searchable field **comment** which will search through the comments, regardless if the exclude comments option is set or not
+* View Toolbar commands have tooltips which mention the shortcut to toggle the command while focus is on the search box
 
 ## [1.3.0] - 2020-02-02
 ### Added
