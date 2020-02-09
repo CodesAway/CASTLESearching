@@ -27,6 +27,7 @@ In short, magic.
 ### Details
 CASTLE Searching uses Apache Lucene to index your workspace files. It creates an index, like found in a book, so you can easily find related code based on searching by key phrases.
 
+* Automatic reindexing of changed files (as changes are made within Eclipse or outside of Eclipse)
 * Identifies key phases by breaking up camelCase, PascalCase, snake_case / SNAKE_CASE, and kebab-case phrases into their individual parts, such as "camel" and "case"
 * Makes use of some Lucene functionality to search for the various word forms such as compare, compararing, comparison, and comparator.
 * Indexes each line of code and stores metadata such as the Eclipse project, pathname, filename, extension, and line number
