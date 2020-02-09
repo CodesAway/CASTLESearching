@@ -4,8 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+* CASTLE Searching is licensed under BSD-3-clause
+  * The Eclipse plugin now mentions the license text (versus having no mention of a license)
+  * The LICENSE file will be included as part of the plugin
+
 ## [1.4.0] - 2020-02-06
 ### Added
+* CASTLE Searching was made open source, available on GitHub
 * View Toolbar toggle command to exclude comments from search results
   * Reqires rebuild of index to use new functionality
   * Can always opt to not reindex (will use the new format as files are modified)
