@@ -1,20 +1,20 @@
-![CASTLE Searching](http://codesaway.info/images/CASTLESearching.png)
+![CASTLE Searching](https://codesaway.info/images/CASTLESearching.png)
 
 # CASTLE Searching
 CASTLE Searching is an Eclipse plugin, which allows you to find what you're looking for faster.
-http://codesaway.info/CASTLESearching/
+https://codesaway.info/CASTLESearching/
 
 ## Update site
-[codesaway.info/CASTLESearching/eclipse](http://codesaway.info/CASTLESearching/eclipse)
+[codesaway.info/CASTLESearching/eclipse](https://codesaway.info/CASTLESearching/eclipse)
 
 ### Stable
 * **Name**: CASTLE Searching
-* **Location**: http://codesaway.info/CASTLESearching/eclipse
+* **Location**: https://codesaway.info/CASTLESearching/eclipse
 * **Version**: 1.2.4
 
 ### Beta
 * **Name**: CASTLE Searching (beta)
-* **Location**: http://codesaway.info/CASTLESearching/eclipse-beta
+* **Location**: https://codesaway.info/CASTLESearching/eclipse-beta
 * **Version**: 1.4.0
 
 ## What is CASTLE Searching?
@@ -40,18 +40,18 @@ This allows doing complex filtering with a simple query.
 2. Click **Add...** to add a new site
    * Stable
       * **Name**: CASTLE Searching
-      * **Location**: http://codesaway.info/CASTLESearching/eclipse
+      * **Location**: https://codesaway.info/CASTLESearching/eclipse
       * Click **Add**
    * Beta
       * **Name**: CASTLE Searching (beta)
-      * **Location**: http://codesaway.info/CASTLESearching/eclipse-beta
+      * **Location**: https://codesaway.info/CASTLESearching/eclipse-beta
       * Click **Add**
 3. Check the box next to CASTLE Searching to install the plugin
 4. Click **Next**
 5. Accept the license agreement and click **Finish**
 6. When prompted, install the plugin even though it's not digitally signed
 7. Restart Eclipse when asked
-8. Start CASTLE Searching! ![CASTLE Searching](http://codesaway.info/images/CASTLE.png)
+8. Start CASTLE Searching! ![CASTLE Searching](https://codesaway.info/images/CASTLE.png)
    * In Eclipse, go to the search page (under the **Search** menu -> **Search...**) and CASTLE Searching will now be the first tab
    * You can also open the view under **Window** -> **Show View** -> **Other...**
    * This shows the CASTLE Searching view, where you can search and the results will be shown immediately
