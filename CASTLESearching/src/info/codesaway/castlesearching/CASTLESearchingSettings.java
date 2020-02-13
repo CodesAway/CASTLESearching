@@ -434,9 +434,9 @@ public class CASTLESearchingSettings {
 		return true;
 	}
 
-	private static final String DEFAULT_SETTINGS_XML = "<settings xmlns='http://codesaway.info/CASTLESearching/'\r\n"
+	private static final String DEFAULT_SETTINGS_XML = "<settings xmlns='https://codesaway.info/CASTLESearching/'\r\n"
 			+ "	xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\r\n"
-			+ "	xsi:schemaLocation='http://codesaway.info/CASTLESearching/CASTLESearching.xsd'>\r\n"
+			+ "	xsi:schemaLocation='https://codesaway.info/CASTLESearching/CASTLESearching.xsd'>\r\n"
 			+ "	<indexers version='0'>\r\n" + "		<indexer ext='java'>\r\n" + "			<filename-patterns>\r\n"
 			+ "				<filename-pattern>\r\n" + "             	<pattern>(?!)</pattern>\r\n"
 			+ "             	<field>$0</field>\r\n" + "             	<value>$0</value>\r\n"
