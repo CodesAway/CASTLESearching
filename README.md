@@ -15,7 +15,7 @@ https://codesaway.info/CASTLESearching/
 ### Beta
 * **Name**: CASTLE Searching (beta)
 * **Location**: https://codesaway.info/CASTLESearching/eclipse-beta
-* **Version**: 1.4.0
+* **Version**: 1.5.0
 
 ## What is CASTLE Searching?
 CASTLE Searching is a **C**ode **A**nalyzer **S**earch **T**ool **L**ooking @ **E**verything Searching
