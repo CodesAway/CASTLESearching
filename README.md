@@ -10,7 +10,7 @@ https://codesaway.info/CASTLESearching/
 ### Stable
 * **Name**: CASTLE Searching
 * **Location**: https://codesaway.info/CASTLESearching/eclipse
-* **Version**: 1.2.4
+* **Version**: 1.4.0
 
 ### Beta
 * **Name**: CASTLE Searching (beta)
