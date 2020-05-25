@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * Element column which shows Java method / field where code is located
   * The column is shown in the CASTLE results
-  * For can also filter this value using the **element** field
+  * You can also filter this value using the **element** field
 * Dropdown menu to show previous searches
 * CASTLE Searching is licensed under BSD-3-clause
   * The Eclipse plugin now mentions the license text (versus having no mention of a license)
