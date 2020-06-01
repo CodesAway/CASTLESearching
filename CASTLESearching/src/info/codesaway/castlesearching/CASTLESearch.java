@@ -1,6 +1,5 @@
 package info.codesaway.castlesearching;
 
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -11,6 +10,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
+import info.codesaway.castlesearching.searcher.CASTLESearcher;
+
 @NonNullByDefault
 public class CASTLESearch {
 	private final String text;
@@ -18,19 +19,19 @@ public class CASTLESearch {
 	private final boolean shouldSelectFirstResult;
 	private final int hitLimit;
 	private final Optional<Query> extraQuery;
-	private final Path indexPath;
+	private final CASTLESearcher searcher;
 	private final Operator defaultOperator;
 	private final boolean shouldIncludeComments;
 
 	public CASTLESearch(final String text, final long delay, final boolean shouldSelectFirstResult, final int hitLimit,
-			final Optional<Query> extraQuery, final Path indexPath, final Operator defaultOperator,
+			final Optional<Query> extraQuery, final CASTLESearcher searcher, final Operator defaultOperator,
 			final boolean shouldIncludeComments) {
 		this.text = text;
 		this.delay = delay;
 		this.shouldSelectFirstResult = shouldSelectFirstResult;
 		this.hitLimit = hitLimit;
 		this.extraQuery = extraQuery;
-		this.indexPath = indexPath;
+		this.searcher = searcher;
 		this.defaultOperator = defaultOperator;
 		this.shouldIncludeComments = shouldIncludeComments;
 	}
@@ -59,8 +60,8 @@ public class CASTLESearch {
 		return this.extraQuery;
 	}
 
-	public Path getIndexPath() {
-		return this.indexPath;
+	public CASTLESearcher getSearcher() {
+		return this.searcher;
 	}
 
 	public Operator getDefaultOperator() {
@@ -84,7 +85,7 @@ public class CASTLESearch {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.extraQuery, this.hitLimit, this.text, this.indexPath, this.defaultOperator,
+		return Objects.hash(this.extraQuery, this.hitLimit, this.text, this.searcher, this.defaultOperator,
 				this.shouldIncludeComments);
 	}
 
@@ -101,7 +102,7 @@ public class CASTLESearch {
 		}
 		CASTLESearch other = (CASTLESearch) obj;
 		return Objects.equals(this.extraQuery, other.extraQuery) && this.hitLimit == other.hitLimit
-				&& Objects.equals(this.text, other.text) && Objects.equals(this.indexPath, other.indexPath)
+				&& Objects.equals(this.text, other.text) && Objects.equals(this.searcher, other.searcher)
 				&& this.defaultOperator == other.defaultOperator
 				&& this.shouldIncludeComments == other.shouldIncludeComments;
 	}
@@ -113,7 +114,7 @@ public class CASTLESearch {
 		String toString = String.format(
 				"CASTLE Searching top %d hits for %s%s (%s; defaultOperator = %s; includeComments = %s)", this.hitLimit,
 				this.text, this.extraQuery.isPresent() ? " with extra query " + this.extraQuery.get() : "",
-				this.indexPath, this.defaultOperator, this.shouldIncludeComments);
+				this.searcher.getIndexPath(), this.defaultOperator, this.shouldIncludeComments);
 
 		return toString;
 	}

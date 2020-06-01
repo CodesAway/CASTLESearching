@@ -37,6 +37,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -71,12 +74,14 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import info.codesaway.castlesearching.handlers.PreviousSearchesHandler;
 import info.codesaway.castlesearching.indexer.CASTLEIndexer;
 import info.codesaway.castlesearching.indexer.java.CASTLEJavaIndexer;
 import info.codesaway.castlesearching.jobs.CASTLEIndexJob;
@@ -141,6 +146,11 @@ public class CASTLESearchingView extends ViewPart {
 	// setIndexCreated with false would do nothing, since the value didn't
 	// change)
 	private boolean isIndexCreated = true;
+
+	private static int DEFAULT_PREVIOUS_SEARCHES_COUNT = 10;
+	private final int previousSeachesLimit = DEFAULT_PREVIOUS_SEARCHES_COUNT;
+	private final ArrayDeque<CASTLESearchResult> previousSearches = new ArrayDeque<>(DEFAULT_PREVIOUS_SEARCHES_COUNT);
+	private static IHandlerActivation previousSearcHandlerActivation;
 
 	public static final String INDEXING_STATUS = "Indexing...";
 	public static final String ERROR_STATUS = "ERROR";
@@ -350,6 +360,8 @@ public class CASTLESearchingView extends ViewPart {
 		INSTANCE = this;
 
 		Activator.refreshStyles();
+
+		this.clearPreviousSearches();
 
 		// Index the current files when the view is created
 		this.index();
@@ -769,7 +781,13 @@ public class CASTLESearchingView extends ViewPart {
 	@NonNullByDefault
 	public void search(final long delay, final boolean shouldSelectFirstResult, final int hitLimit,
 			final Optional<Query> extraQuery) {
-		Path indexPath = this.getIndexPath();
+		CASTLESearcher searcher = CASTLESearchingSettings.getSearcher(this.comboDropDown.getText());
+
+		if (searcher == null) {
+			return;
+		}
+
+		Path indexPath = searcher.getIndexPath();
 
 		if (indexPath == null) {
 			return;
@@ -779,24 +797,11 @@ public class CASTLESearchingView extends ViewPart {
 		Operator defaultOperator = this.getDefaultOperator();
 		boolean shouldIncludeComments = this.shouldIncludeComments();
 
-		CASTLESearch search = new CASTLESearch(text, delay, shouldSelectFirstResult, hitLimit, extraQuery, indexPath,
+		CASTLESearch search = new CASTLESearch(text, delay, shouldSelectFirstResult, hitLimit, extraQuery, searcher,
 				defaultOperator, shouldIncludeComments);
 
 		// Determines whether to run the current search or the new search
 		searchJob.handleSearch(search);
-	}
-
-	@Nullable
-	public Path getIndexPath() {
-		CASTLESearcher searcher = CASTLESearchingSettings.getSearcher(this.comboDropDown.getText());
-
-		if (searcher == null) {
-			// System.out.println("Combo: " + this.comboDropDown.getText());
-
-			return null;
-		}
-
-		return searcher.getIndexPath();
 	}
 
 	public static boolean isIndexing() {
@@ -1045,6 +1050,7 @@ public class CASTLESearchingView extends ViewPart {
 
 		this.createTableViewerColumn("#", 50, CASTLESearchResultEntry::getResultNumber);
 		this.createTableViewerColumn("File", 250, CASTLESearchResultEntry::getFile);
+		this.createTableViewerColumn("Element", 250, CASTLESearchResultEntry::getElement);
 		this.createTableViewerColumn("Line", 65, CASTLESearchResultEntry::getLine);
 		// Put type before content, since can use type for quick understanding
 		// of line
@@ -1260,6 +1266,10 @@ public class CASTLESearchingView extends ViewPart {
 	}
 
 	public static void cancelJobs() {
+		if (INSTANCE != null) {
+			INSTANCE.clearPreviousSearches();
+		}
+
 		Activator.WORKSPACE.removeResourceChangeListener(RESOURCE_CHANGE_LISTENER);
 
 		CASTLESearchingSettings.stopWatchingSettings();
@@ -1442,10 +1452,131 @@ public class CASTLESearchingView extends ViewPart {
 				INSTANCE.viewer.getControl().setFont(font);
 				INSTANCE.viewer.refresh();
 
-				// Recalculate display based on changed fornt size
+				// Recalculate display based on changed font size
 				// https://www.eclipse.org/articles/Article-Understanding-Layouts/Understanding-Layouts.htm
 				INSTANCE.messageLabel.getParent().layout();
 			});
 		}
+	}
+
+	/**
+	 * <p><b>NOTE:</b>Must call from UI thread or else won't do anything</p>
+	 * @param isEnabled
+	 */
+	private void setPreviousSearchesEnabled(final boolean isEnabled) {
+		// TODO: https://www.eclipse.org/forums/index.php/t/449683/
+
+		String commandId = "info.codesaway.castlesearching.commands.previousSearches";
+
+		IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
+		//		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+
+		if (isEnabled && previousSearcHandlerActivation == null) {
+			//			Command command = commandService.getCommand(commandId);
+			previousSearcHandlerActivation = handlerService.activateHandler(commandId, new PreviousSearchesHandler());
+		} else if (!isEnabled && previousSearcHandlerActivation != null) {
+			handlerService.deactivateHandler(previousSearcHandlerActivation);
+			previousSearcHandlerActivation = null;
+		}
+
+		// Reference: http://blog.sdruskat.net/control-visibility-of-menu-contributions-on-text-selection-with-propertytesters/
+		// https://stackoverflow.com/a/21836699
+		/*
+		 *    <!--<extension
+		 point="org.eclipse.core.expressions.propertyTesters">
+		<propertyTester
+		    class="info.codesaway.castlesearching.propertytesters.PreviousSearchesTester"
+		    id="info.codesaway.castlesearching.propertytesters.PreviousSearchesTester"
+		    namespace="info.codesaway.castlesearching.propertytesters"
+		    properties="nonEmpty"
+		    type="java.lang.Object">
+		</propertyTester>
+		</extension>
+		-->
+		<!--<extension
+		 point="org.eclipse.ui.handlers">
+		<handler
+		    class="info.codesaway.castlesearching.handlers.PreviousSearchesHandler"
+		    commandId="info.codesaway.castlesearching.commands.previousSearches">
+		 <enabledWhen>
+		       <test 
+		       		property="info.codesaway.castlesearching.propertytesters.nonEmpty">
+		       </test>
+		 </enabledWhen>
+		</handler>
+		</extension>
+		-->
+		 */
+	}
+
+	private void clearPreviousSearches() {
+		this.previousSearches.clear();
+		this.setPreviousSearchesEnabled(false);
+	}
+
+	public void addSearch(final CASTLESearchResult result) {
+		// Remove if it's the same search
+		this.previousSearches.removeIf(i -> i.getSearch().equals(result.getSearch()));
+
+		while (this.previousSearches.size() >= this.previousSeachesLimit) {
+			// Remove the last search
+			this.previousSearches.removeLast();
+		}
+
+		// Push the new search onto the stack
+		this.previousSearches.push(result);
+		this.setPreviousSearchesEnabled(true);
+	}
+
+	public void fillPreviousSearches(final IMenuManager manager) {
+		if (this.previousSearches.isEmpty()) {
+			IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
+			return;
+		}
+
+		for (CASTLESearchResult result : this.previousSearches) {
+			Action action = new Action() {
+				@Override
+				public void run() {
+					CASTLESearchingView.this.restoreSearchResult(result);
+				}
+			};
+			CASTLESearch search = result.getSearch();
+			String text = String.format("'%s' - %s (in %s)", search.getText(), result.getMessage(),
+					search.getSearcher().getName());
+			action.setText(text);
+
+			manager.add(action);
+		}
+
+		manager.add(new Separator());
+
+		Action action = new Action() {
+			@Override
+			public void run() {
+				CASTLESearchingView.this.clearPreviousSearches();
+			}
+		};
+		String text = "Clear History";
+		action.setText(text);
+
+		manager.add(action);
+
+		manager.update();
+	}
+
+	protected void restoreSearchResult(final CASTLESearchResult result) {
+		CASTLESearch search = result.getSearch();
+
+		// TODO: seems setting these values cause the search to run
+		this.searchText.setText(search.getText());
+		this.setSearcherName(search.getSearcher().getName());
+		this.setMessage(result.getMessage());
+		this.setResults(result.getResults());
+		System.out.println("Result size: " + result.getResults().size());
+
+		// TODO: toggle / restore settings based on CASTLESearch
+		// TODO: if delete result entry, make sure actually removing from CASTLESearchResult
+		// (if seems that the restore brings it back, which suggests it's being deleted from a copy, not from the actual search results)
 	}
 }

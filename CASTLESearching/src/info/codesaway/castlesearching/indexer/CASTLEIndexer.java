@@ -45,10 +45,23 @@ import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.text.DefaultLineTracker;
+
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
 
 import info.codesaway.castlesearching.Activator;
 import info.codesaway.castlesearching.CASTLESearching;
@@ -62,6 +75,7 @@ import info.codesaway.castlesearching.indexer.java.JavaIndexerRequest;
 import info.codesaway.castlesearching.indexer.java.JavaIndexerReturn;
 import info.codesaway.castlesearching.jobs.CASTLEIndexJob;
 import info.codesaway.castlesearching.util.DateUtilities;
+import info.codesaway.castlesearching.util.JDTUtilities;
 import info.codesaway.castlesearching.util.PathWithLastModified;
 import info.codesaway.castlesearching.util.PathWithTerm;
 import info.codesaway.util.regex.Matcher;
@@ -520,6 +534,50 @@ public class CASTLEIndexer {
 		String previousLine = "";
 		String previousLineType = "";
 
+		// https://www.vogella.com/tutorials/EclipseJDT/article.html
+		// https://stackoverflow.com/a/11168301
+		RangeMap<Integer, String> javaElements = TreeRangeMap.create();
+
+		IFile[] files = Activator.WORKSPACE.getRoot().findFilesForLocationURI(file.toURI());
+
+		if (files.length > 0) {
+			ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(files[0]);
+			//			System.out.println("Parse: " + file);
+
+			try {
+				// Note: offset 0 is line 0
+				// (so add 1 to line number to match what would show on the screen)
+				DefaultLineTracker lineTracker = new DefaultLineTracker();
+				lineTracker.set(compilationUnit.getSource());
+
+				IType[] types = compilationUnit.getTypes();
+				for (IType type : types) {
+					IField[] fields = type.getFields();
+					for (IField field : fields) {
+						String elementName = field.getElementName();
+						ISourceRange sourceRange = field.getSourceRange();
+						JDTUtilities.addRange(sourceRange, elementName, javaElements, lineTracker);
+					}
+
+					IMethod[] methods = type.getMethods();
+					for (IMethod method : methods) {
+						@NonNull
+						@SuppressWarnings("null")
+						String elementName = method.getElementName();
+						//						System.out.println("Method name " + method.getElementName());
+						//						System.out.println("Signature " + method.getSignature());
+						//						System.out.println("Return Type " + method.getReturnType());
+
+						ISourceRange sourceRange = method.getSourceRange();
+						JDTUtilities.addRange(sourceRange, elementName, javaElements, lineTracker);
+					}
+				}
+			} catch (JavaModelException e) {
+				// Do nothing
+				// (if there's an error, just don't index line info
+			}
+		}
+
 		// Read input line by line
 		// TODO: select a better charset
 		try (BufferedReader reader = Files.newBufferedReader(path, ISO_8859_1)) {
@@ -539,8 +597,16 @@ public class CASTLEIndexer {
 				document.add(new TextField(PATH_FIELD, pathString, Field.Store.NO));
 				document.add(new TextField("file", filename, Field.Store.YES));
 
+				@Nullable
+				String element = javaElements.get(lineNumber);
+
+				if (element != null) {
+					document.add(new TextField("element", element, Field.Store.YES));
+				}
+
 				// Store line as int instead of as String
 				document.add(new IntPoint("line", lineNumber));
+
 				document.add(new StoredField("line", lineNumber));
 				// document.add(new StringField("line",
 				// String.valueOf(lineNumber), Field.Store.YES));

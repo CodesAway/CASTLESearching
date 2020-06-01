@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CASTLE Searching
 Bundle-SymbolicName: info.codesaway.castlesearching;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.5.0.qualifier
 Bundle-Activator: info.codesaway.castlesearching.Activator
 Bundle-Vendor: CodesAway
 Require-Bundle: org.eclipse.ui,
@@ -14,7 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
  org.eclipse.ui.ide,
- org.eclipse.ui.editors
+ org.eclipse.ui.editors,
+ org.eclipse.jdt.core,
+ org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/lucene-analyzers-common-8.3.1.jar,
@@ -23,13 +25,33 @@ Bundle-ClassPath: lib/lucene-analyzers-common-8.3.1.jar,
  lib/lucene-queryparser-8.3.1.jar,
  lib/RegExPlus-0.4-beta.jar,
  lib/SystemClipboard.jar,
- .
-Export-Package: info.codesaway.castlesearching,
+ .,
+ lib/guava-29.0-jre.jar
+Export-Package: com.google.common.annotations,
+ com.google.common.base,
+ com.google.common.base.internal;x-internal:=true,
+ com.google.common.cache,
+ com.google.common.collect,
+ com.google.common.escape,
+ com.google.common.eventbus,
+ com.google.common.graph,
+ com.google.common.hash,
+ com.google.common.html,
+ com.google.common.io,
+ com.google.common.math,
+ com.google.common.net,
+ com.google.common.primitives,
+ com.google.common.reflect,
+ com.google.common.util.concurrent,
+ com.google.common.xml,
+ com.google.thirdparty.publicsuffix,
+ info.codesaway.castlesearching,
  info.codesaway.castlesearching.handlers,
  info.codesaway.castlesearching.indexer,
  info.codesaway.castlesearching.indexer.java,
  info.codesaway.castlesearching.jobs,
  info.codesaway.castlesearching.linetype,
+ info.codesaway.castlesearching.menus,
  info.codesaway.castlesearching.searcher,
  info.codesaway.castlesearching.util,
  info.codesaway.util,

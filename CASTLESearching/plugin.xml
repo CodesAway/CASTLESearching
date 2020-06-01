@@ -66,19 +66,13 @@
             defaultHandler="info.codesaway.castlesearching.handlers.RebuildIndexHandler"
             id="info.codesaway.castlesearching.commands.rebuildindex"
             name="Rebuild Index">
-         <state
-               class="org.eclipse.ui.handlers.RegistryToggleState:false"
-               id="org.eclipse.ui.commands.toggleState">
-         </state>
+      </command>
+      <command
+            categoryId="info.codesaway.castlesearching.commands.category"
+            id="info.codesaway.castlesearching.commands.previousSearches"
+            name="Show Previous Searches">
       </command>
    </extension>
-   <!--<extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="info.codesaway.castlesearching.handlers.SearchHandler"
-            commandId="info.codesaway.castlesearching.commands.operatorand">
-      </handler>
-   </extension>-->
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
@@ -105,6 +99,13 @@
                style="toggle"
                tooltip="Include comments in search results (ALT + /)">
          </command>
+         <command
+               commandId="info.codesaway.castlesearching.commands.previousSearches"
+               icon="icons/CASTLE.png"
+               label="Show Previous Searches"
+               style="pulldown"
+               tooltip="Show Previous Searches">
+         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -114,6 +115,14 @@
                label="Rebuild Index"
                style="push">
          </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:info.codesaway.castlesearching.commands.previousSearches">
+         <dynamic
+               class="info.codesaway.castlesearching.menus.PreviousSearchesMenu"
+               id="info.codesaway.castlesearching.menus.PreviousSearchesMenu">
+         </dynamic>
       </menuContribution>
    </extension>
 </plugin>

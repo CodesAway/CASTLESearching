@@ -33,8 +33,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Display;
 
 import info.codesaway.castlesearching.CASTLESearch;
+import info.codesaway.castlesearching.CASTLESearchResult;
 import info.codesaway.castlesearching.CASTLESearchResultEntry;
-import info.codesaway.castlesearching.CASTLESearchReturn;
 import info.codesaway.castlesearching.CASTLESearching;
 import info.codesaway.castlesearching.CASTLESearchingSettings;
 import info.codesaway.castlesearching.CASTLESearchingView;
@@ -175,7 +175,7 @@ public class CASTLESearchJob extends Job {
 		}
 	}
 
-	public void schedule(final CASTLESearch search) {
+	private void schedule(final CASTLESearch search) {
 		this.currentSearch = search;
 		this.searchAfter = null;
 
@@ -203,8 +203,8 @@ public class CASTLESearchJob extends Job {
 			// });
 
 			// System.out.println("Run: " + this.currentSearch);
-			CASTLESearchReturn results = search(this.currentSearch, this.searchAfter);
-			this.searchAfter = results.getLastDocument();
+			CASTLESearchResult result = search(this.currentSearch, this.searchAfter);
+			this.searchAfter = result.getLastDocument();
 
 			if (monitor.isCanceled()) {
 				// System.out.println("Canceled?!");
@@ -218,16 +218,17 @@ public class CASTLESearchJob extends Job {
 			// is created,
 			// perform search again automatically
 			// (this way, user can see search results once available)
-			this.view.setIndexCreated(results.isIndexCreated());
+			this.view.setIndexCreated(result.isIndexCreated());
 
 			// var:test file:compare
 
 			if (display != null) {
 				display.syncExec(() -> {
 					// Run in UI
-					List<CASTLESearchResultEntry> resultsList = results.getResults();
+					List<CASTLESearchResultEntry> resultsList = result.getResults();
 
 					this.view.setResults(resultsList);
+					this.view.addSearch(result);
 
 					if (!resultsList.isEmpty()) {
 						if (this.currentSearch.shouldSelectFirstResult()) {
@@ -244,15 +245,14 @@ public class CASTLESearchJob extends Job {
 					this.view.setLastSearchDoneTime(System.currentTimeMillis());
 
 					if (this.view.getStatus().equals(CASTLESearchingView.ERROR_STATUS)) {
-						if (this.view.isIndexing()) {
+						if (CASTLESearchingView.isIndexing()) {
 							this.view.setStatus(CASTLESearchingView.INDEXING_STATUS);
 						} else {
 							this.view.setStatus("");
 						}
 					}
 
-					this.view.setMessage(results.getMessage());
-
+					this.view.setMessage(result.getMessage());
 				});
 			}
 		} catch (IOException e) {
@@ -278,7 +278,7 @@ public class CASTLESearchJob extends Job {
 		return Status.OK_STATUS;
 	}
 
-	public static CASTLESearchReturn search(final CASTLESearch search, @Nullable final ScoreDoc searchAfter)
+	public static CASTLESearchResult search(final CASTLESearch search, @Nullable final ScoreDoc searchAfter)
 			throws IOException, QueryNodeException, ParseException {
 
 		// TODO: add menu option to do full reindex
@@ -287,11 +287,12 @@ public class CASTLESearchJob extends Job {
 		// https://howtodoinjava.com/lucene/lucene-index-search-examples/
 
 		// TODO: make more generic to handle multiple SearchManagers
-		SearcherManager searcherManager = CASTLESearchingSettings.getSearcherManager(search.getIndexPath());
+		SearcherManager searcherManager = CASTLESearchingSettings
+				.getSearcherManager(search.getSearcher().getIndexPath());
 
 		if (searcherManager == null) {
 			String message = "Cannot query until index is initialized. Your query will run shortly.";
-			return new CASTLESearchReturn(Collections.emptyList(), message, false, null);
+			return new CASTLESearchResult(search, Collections.emptyList(), message, false, null);
 		}
 
 		IndexSearcher searcher = searcherManager.acquire();
@@ -462,6 +463,7 @@ public class CASTLESearchJob extends Job {
 				Document d = searcher.doc(sd.doc);
 				String path = d.get(CASTLEIndexer.FULL_PATH_FIELD);
 				String file = d.get("file");
+				String element = d.get("element");
 				String line = d.get("line");
 				String type = d.get("type");
 				// String date = d.get("date");
@@ -472,6 +474,10 @@ public class CASTLESearchJob extends Job {
 					content = content.trim();
 				} else {
 					content = "";
+				}
+
+				if (element == null) {
+					element = "";
 				}
 
 				if (type == null) {
@@ -488,7 +494,8 @@ public class CASTLESearchJob extends Job {
 
 				resultIndex++;
 
-				results.add(new CASTLESearchResultEntry(resultIndex, file, line, content, type, path, extension));
+				results.add(
+						new CASTLESearchResultEntry(resultIndex, file, element, line, content, type, path, extension));
 
 				// if (isTesting && type != null) {
 				// System.out.println("Type: " + type);
@@ -504,6 +511,6 @@ public class CASTLESearchJob extends Job {
 			searcher = null;
 		}
 
-		return new CASTLESearchReturn(results, message, true, lastDocument);
+		return new CASTLESearchResult(search, results, message, true, lastDocument);
 	}
 }

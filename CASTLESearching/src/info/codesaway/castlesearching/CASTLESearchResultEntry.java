@@ -4,6 +4,7 @@ public class CASTLESearchResultEntry {
 	private final int resultIndex;
 	private final String resultNumber;
 	private final String file;
+	private final String element;
 	private final String line;
 	private final String content;
 	private final String type;
@@ -19,12 +20,13 @@ public class CASTLESearchResultEntry {
 	 * @param type
 	 * @param path
 	 */
-	public CASTLESearchResultEntry(final int resultIndex, final String file, final String line, final String content,
-			final String type, final String path, final String extension) {
+	public CASTLESearchResultEntry(final int resultIndex, final String file, final String element, final String line,
+			final String content, final String type, final String path, final String extension) {
 		this.resultIndex = resultIndex;
 		this.resultNumber = String.valueOf(resultIndex);
 
 		this.file = file;
+		this.element = element;
 		this.line = line;
 		this.content = content;
 		this.type = type;
@@ -42,6 +44,10 @@ public class CASTLESearchResultEntry {
 
 	public String getFile() {
 		return this.file;
+	}
+
+	public String getElement() {
+		return this.element;
 	}
 
 	public String getLine() {
