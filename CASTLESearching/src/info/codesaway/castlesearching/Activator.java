@@ -38,7 +38,6 @@ public class Activator extends AbstractUIPlugin {
 	public static final IWorkspaceRoot WORKSPACE_ROOT = WORKSPACE.getRoot();
 
 	public static final String WORKSPACE_PATHNAME = WORKSPACE_ROOT.getLocation().toString();
-	// public static final String WORKSPACE_PATHNAME = "C:\\Workspaces\\JBoss";
 
 	public static final Path WORKSPACE_PATH = Paths.get(WORKSPACE_PATHNAME);
 
