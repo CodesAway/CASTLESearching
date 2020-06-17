@@ -9,12 +9,12 @@ https://codesaway.info/CASTLESearching/
 
 ### Stable
 * **Name**: CASTLE Searching
-* **Location**: https://codesaway.info/CASTLESearching/eclipse
-* **Version**: 1.4.0
+* **Location**: https://codesaway.info/eclipse
+* **Version**: 1.5.0
 
 ### Beta
 * **Name**: CASTLE Searching (beta)
-* **Location**: https://codesaway.info/CASTLESearching/eclipse-beta
+* **Location**: https://codesaway.info/eclipse-beta
 * **Version**: 1.5.0
 
 ## What is CASTLE Searching?
