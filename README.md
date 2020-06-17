@@ -5,7 +5,7 @@ CASTLE Searching is an Eclipse plugin, which allows you to find what you're look
 https://codesaway.info/CASTLESearching/
 
 ## Update site
-[codesaway.info/CASTLESearching/eclipse](https://codesaway.info/CASTLESearching/eclipse)
+[codesaway.info/eclipse](https://codesaway.info/eclipse)
 
 ### Stable
 * **Name**: CASTLE Searching
