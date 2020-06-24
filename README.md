@@ -51,7 +51,7 @@ This allows doing complex filtering with a simple query.
 5. Accept the license agreement and click **Finish**
 6. When prompted, install the plugin even though it's not digitally signed
 7. Restart Eclipse when asked
-8. Start CASTLE Searching! ![CASTLE Searching](https://codesaway.info/images/CASTLE.png)
+8. Start CASTLE Searching! ![CASTLE Searching](https://codesaway.info/images/CASTLE@2x.png)
    * In Eclipse, go to the search page (under the **Search** menu -> **Search...**) and CASTLE Searching will now be the first tab
    * You can also open the view under **Window** -> **Show View** -> **Other...**
    * This shows the CASTLE Searching view, where you can search and the results will be shown immediately
