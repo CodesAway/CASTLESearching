@@ -40,11 +40,11 @@ This allows doing complex filtering with a simple query.
 2. Click **Add...** to add a new site
    * Stable
       * **Name**: CASTLE Searching
-      * **Location**: https://codesaway.info/CASTLESearching/eclipse
+      * **Location**: https://codesaway.info/eclipse
       * Click **Add**
    * Beta
       * **Name**: CASTLE Searching (beta)
-      * **Location**: https://codesaway.info/CASTLESearching/eclipse-beta
+      * **Location**: https://codesaway.info/eclipse-beta
       * Click **Add**
 3. Check the box next to CASTLE Searching to install the plugin
 4. Click **Next**
