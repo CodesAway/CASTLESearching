@@ -358,25 +358,25 @@ public class XPathDocument extends XPathNode implements Document {
 
 			//			Node firstChild = node.getFirstChild();
 			Node rootElement = this.getNode().getDocumentElement();
-			NamedNodeMap attributes = null;
+
+			NamedNodeMap attributes = rootElement == null ? null : rootElement.getAttributes();
 
 			final HashMap<String, String> namespaces = new HashMap<>();
 
-			int attributesLength = rootElement == null ||
-					(attributes = rootElement.getAttributes()) == null
-							? 0
-							: attributes.getLength();
+			if (attributes != null) {
+				int attributesLength = attributes.getLength();
 
-			for (int i = 0; i < attributesLength; i++) {
-				// Not actually null, since initialized if length != 0
-				assert attributes != null;
+				for (int i = 0; i < attributesLength; i++) {
+					// Not actually null, since initialized if length != 0
+					assert attributes != null;
 
-				Node attribute = attributes.item(i);
-				String attributeName = attribute.getNodeName();
-				Matcher matcher = namespaceAttributeRegex.matcher(attributeName);
+					Node attribute = attributes.item(i);
+					String attributeName = attribute.getNodeName();
+					Matcher matcher = namespaceAttributeRegex.matcher(attributeName);
 
-				if (matcher.matches()) {
-					namespaces.put(matcher.group("xmlns"), attribute.getNodeValue());
+					if (matcher.matches()) {
+						namespaces.put(matcher.group("xmlns"), attribute.getNodeValue());
+					}
 				}
 			}
 

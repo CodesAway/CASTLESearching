@@ -22,6 +22,7 @@ public class CASTLESearch {
 	private final CASTLESearcher searcher;
 	private final Operator defaultOperator;
 	private final boolean shouldIncludeComments;
+	// Comment
 
 	public CASTLESearch(final String text, final long delay, final boolean shouldSelectFirstResult, final int hitLimit,
 			final Optional<Query> extraQuery, final CASTLESearcher searcher, final Operator defaultOperator,

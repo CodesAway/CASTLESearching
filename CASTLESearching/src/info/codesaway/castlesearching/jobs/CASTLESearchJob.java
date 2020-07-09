@@ -333,15 +333,6 @@ public class CASTLESearchJob extends Job {
 				query = standardQueryParser.parse(search.getText(), "content");
 			}
 
-			// Test queries / searches
-			// * var:test file:compare - get line testingFile assignment in
-			// CompareDirectories
-			// * FABM:MAM get FABMMbrAcctMaint
-			// * pending retirement -DBPendingRetirement (doesn't work when
-			// parse query using camel case)
-			// TODO: likely should give option, since most of the time want
-			// enabled, but sometimes don't
-
 			// Set commented out lines as lower priority
 			// (whereas Javadoc keeps the same priority)
 			String commentedOutQueryText = "*:*" + " AND NOT comment";

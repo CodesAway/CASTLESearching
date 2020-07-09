@@ -15,22 +15,22 @@ public class DateUtilities {
 	/**
 	 * Convert to Date
 	 *
-	 * @param pLocalDate
+	 * @param localDate
 	 * @return
 	 */
-	public static Date asDate(final LocalDate pLocalDate) {
-		return asDate(pLocalDate, ZoneId.systemDefault());
+	public static Date asDate(final LocalDate localDate) {
+		return asDate(localDate, ZoneId.systemDefault());
 	}
 
 	/**
 	 * Convert to Date
 	 *
-	 * @param pLocalDate
-	 * @param pZoneId
+	 * @param localDate
+	 * @param zoneId
 	 * @return
 	 */
-	public static Date asDate(final LocalDate pLocalDate, final ZoneId pZoneId) {
-		return Date.from(pLocalDate.atStartOfDay(pZoneId).toInstant());
+	public static Date asDate(final LocalDate localDate, final ZoneId zoneId) {
+		return Date.from(localDate.atStartOfDay(zoneId).toInstant());
 	}
 
 	// TODO: Java's regex doesn't allow underscore or hyphen in group name

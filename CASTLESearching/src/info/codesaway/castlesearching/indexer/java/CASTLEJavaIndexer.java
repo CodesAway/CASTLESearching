@@ -62,9 +62,6 @@ public class CASTLEJavaIndexer {
 
 	// TODO: indicate special types of assignment (such as copying from another
 	// object, same field name)
-	// TODO: test search
-	// +BE:BefEmpDtls +line:[44 TO 47] -file:rsv
-	// +rmd +BE:BefEmpRsvDtls
 	private static final ThreadLocal<Matcher> declarationAndAssignmentMatchers = RegexUtilities
 			.getThreadLocalMatcher("^(?:\\s*+(?:public|protected|private|static|final)\\s++)*+"
 					// Intentionally left as non-possessive at end so can handle

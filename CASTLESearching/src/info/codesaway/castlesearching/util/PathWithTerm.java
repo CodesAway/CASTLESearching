@@ -10,14 +10,16 @@ import info.codesaway.castlesearching.indexer.CASTLEIndexer;
 
 @NonNullByDefault
 public interface PathWithTerm {
+	public String getProject();
+
 	public Path getPath();
 
 	public File getFile();
 
 	public Term getTerm();
 
-	public static PathWithTerm wrap(final Path path) {
-		return new Wrapper(path);
+	public static PathWithTerm wrap(final String project, final Path path) {
+		return new Wrapper(project, path);
 	}
 
 	public static Term getTerm(final String pathname) {
@@ -25,25 +27,32 @@ public interface PathWithTerm {
 	}
 
 	public static class Wrapper implements PathWithTerm {
+		private final String project;
 		private final Path path;
 		private final File file;
 		private final Term term;
 
 		@SuppressWarnings("null")
-		private Wrapper(final Path path) {
+		private Wrapper(final String project, final Path path) {
+			this.project = project;
 			this.path = path;
 			this.file = path.toFile();
 			this.term = PathWithTerm.getTerm(path.toString());
 		}
 
 		@Override
-		public File getFile() {
-			return this.file;
+		public String getProject() {
+			return this.project;
 		}
 
 		@Override
 		public Path getPath() {
 			return this.path;
+		}
+
+		@Override
+		public File getFile() {
+			return this.file;
 		}
 
 		@Override

@@ -26,6 +26,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -175,74 +176,73 @@ public class CASTLESearchingView extends ViewPart {
 	private static final ThreadLocal<Matcher> SEARCH_TEXT_FORMATTER_MATCHERS = RegexUtilities
 			.getThreadLocalMatcher("\\w++(?=:)");
 
-	private static IResourceChangeListener RESOURCE_CHANGE_LISTENER = new IResourceChangeListener() {
-		@Override
-		public void resourceChanged(final IResourceChangeEvent event) {
-			// https://www.eclipse.org/articles/Article-Resource-deltas/resource-deltas.html
-			// if (event.getType() != IResourceChangeEvent.POST_CHANGE) {
-			// return;
-			// }
+	private static IResourceChangeListener RESOURCE_CHANGE_LISTENER = event -> {
+		// https://www.eclipse.org/articles/Article-Resource-deltas/resource-deltas.html
+		// if (event.getType() != IResourceChangeEvent.POST_CHANGE) {
+		// return;
+		// }
 
-			ArrayDeque<IResourceDelta> deltas = new ArrayDeque<>();
-			ArrayDeque<Path> paths = new ArrayDeque<>();
-			ArrayDeque<Term> deletes = new ArrayDeque<>();
-			deltas.add(event.getDelta());
+		ArrayDeque<IResourceDelta> deltas = new ArrayDeque<>();
+		ArrayDeque<PathWithTerm> paths = new ArrayDeque<>();
+		ArrayDeque<Term> deletes = new ArrayDeque<>();
+		deltas.add(event.getDelta());
 
-			while (!deltas.isEmpty()) {
-				IResourceDelta delta = deltas.remove();
+		while (!deltas.isEmpty()) {
+			IResourceDelta delta = deltas.remove();
 
-				// System.out.println(
-				// "Checking Delta: " + delta.getKind() + ": " +
-				// delta.getFlags() + ": " +
-				// delta.getFullPath());
+			// System.out.println(
+			// "Checking Delta: " + delta.getKind() + ": " +
+			// delta.getFlags() + ": " +
+			// delta.getFullPath());
 
-				IResourceDelta[] children = delta.getAffectedChildren();
+			IResourceDelta[] children = delta.getAffectedChildren();
 
-				// Is a file
-				if (children.length == 0) {
-					// The content was modified or it's a new file
-					if ((delta.getFlags() & IResourceDelta.CONTENT) != 0
-							|| (delta.getKind() & IResourceDelta.ADDED) != 0) {
-						IResource resource = delta.getResource();
-						// IJavaElement element = JavaCore.create(resource);
-						// if (element instanceof ICompilationUnit) {
-						// ICompilationUnit unit = (ICompilationUnit) element;
-						// unit.getTypes();
-						// }
-						// JavaCore.createCompilationUnitFrom(null)
+			// Is a file
+			if (children.length == 0) {
+				// The content was modified or it's a new file
+				if ((delta.getFlags() & IResourceDelta.CONTENT) != 0
+						|| (delta.getKind() & IResourceDelta.ADDED) != 0) {
+					IResource resource1 = delta.getResource();
+					// IJavaElement element = JavaCore.create(resource);
+					// if (element instanceof ICompilationUnit) {
+					// ICompilationUnit unit = (ICompilationUnit) element;
+					// unit.getTypes();
+					// }
+					// JavaCore.createCompilationUnitFrom(null)
 
-						Path path = resource.getRawLocation().toFile().toPath();
+					Path path = resource1.getRawLocation().toFile().toPath();
 
-						if (CASTLESearchingSettings.shouldIndexFile(path)) {
-							// System.out.println("Changed! " + path);
-							paths.add(path);
-						}
-					} else if ((delta.getKind() & IResourceDelta.REMOVED) != 0) {
-						// || (delta.getKind() & IResourceDelta.REMOVED_PHANTOM)
-						// != 0) {
-						// Handle removed files
-						// (in this case, just need to delete the documents from
-						// the index
-
-						IResource resource = delta.getResource();
-						@NonNull
-						@SuppressWarnings("null")
-						String pathname = resource.getRawLocation().toFile().toPath().toString();
-
-						deletes.add(PathWithTerm.getTerm(pathname));
+					if (CASTLESearchingSettings.shouldIndexFile(path)) {
+						IProject iProject = resource1.getProject();
+						String project = iProject != null ? iProject.getName() : "";
+						// System.out.println("Changed! " + path);
+						paths.add(PathWithTerm.wrap(project, path));
 					}
-				} else {
-					for (IResourceDelta child : children) {
-						deltas.add(child);
-					}
+				} else if ((delta.getKind() & IResourceDelta.REMOVED) != 0) {
+					// || (delta.getKind() & IResourceDelta.REMOVED_PHANTOM)
+					// != 0) {
+					// Handle removed files
+					// (in this case, just need to delete the documents from
+					// the index
+
+					IResource resource2 = delta.getResource();
+					@NonNull
+					@SuppressWarnings("null")
+					String pathname = resource2.getRawLocation().toFile().toPath().toString();
+
+					deletes.add(PathWithTerm.getTerm(pathname));
+				}
+			} else {
+				for (IResourceDelta child : children) {
+					deltas.add(child);
 				}
 			}
+		}
 
-			// For the added paths, add them to the collection of files to index
-			if (!paths.isEmpty() || !deletes.isEmpty()) {
-				indexJob.cancel();
-				indexJob.schedule(false, paths, deletes);
-			}
+		// For the added paths, add them to the collection of files to index
+		if (!paths.isEmpty() || !deletes.isEmpty()) {
+			indexJob.cancel();
+			indexJob.schedule(false, paths, deletes);
 		}
 	};
 
@@ -314,7 +314,7 @@ public class CASTLESearchingView extends ViewPart {
 		// TODO: save and restore current setting
 		// If prior setting isn't valid (such as removed, default to WORKSPACE
 		this.comboDropDown.setBackground(JFaceColors.getBannerBackground(Display.getCurrent()));
-		this.comboDropDown.addModifyListener((event) -> {
+		this.comboDropDown.addModifyListener(event -> {
 			// Change focus to search text,
 			// so can start typing something after change the search
 			this.setFocus();
@@ -927,7 +927,7 @@ public class CASTLESearchingView extends ViewPart {
 
 		// Double click to open file
 		// https://stackoverflow.com/a/6342124
-		this.viewer.addDoubleClickListener((event) -> {
+		this.viewer.addDoubleClickListener(event -> {
 			IStructuredSelection selection = (IStructuredSelection) this.viewer.getSelection();
 			if (selection.isEmpty()) {
 				return;
@@ -1143,7 +1143,6 @@ public class CASTLESearchingView extends ViewPart {
 		// TODO: handle opening workspace file if project is closed
 		// Example search:
 		// var:test file:compare
-		// File: DBDocStatHistTest.java
 		// TODO: able to open file to line, but may still want to prompt user if
 		// they
 		// want to open the project
@@ -1499,7 +1498,7 @@ public class CASTLESearchingView extends ViewPart {
 		    class="info.codesaway.castlesearching.handlers.PreviousSearchesHandler"
 		    commandId="info.codesaway.castlesearching.commands.previousSearches">
 		 <enabledWhen>
-		       <test 
+		       <test
 		       		property="info.codesaway.castlesearching.propertytesters.nonEmpty">
 		       </test>
 		 </enabledWhen>
@@ -1530,7 +1529,7 @@ public class CASTLESearchingView extends ViewPart {
 
 	public void fillPreviousSearches(final IMenuManager manager) {
 		if (this.previousSearches.isEmpty()) {
-			IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
+			//			IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
 			return;
 		}
 
@@ -1573,7 +1572,7 @@ public class CASTLESearchingView extends ViewPart {
 		this.setSearcherName(search.getSearcher().getName());
 		this.setMessage(result.getMessage());
 		this.setResults(result.getResults());
-		System.out.println("Result size: " + result.getResults().size());
+		//		System.out.println("Result size: " + result.getResults().size());
 
 		// TODO: toggle / restore settings based on CASTLESearch
 		// TODO: if delete result entry, make sure actually removing from CASTLESearchResult

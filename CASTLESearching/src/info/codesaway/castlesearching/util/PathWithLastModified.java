@@ -8,6 +8,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
 public class PathWithLastModified implements PathWithTerm {
+	private final String project;
 	private final Path path;
 	private final File file;
 	private final String pathname;
@@ -16,7 +17,8 @@ public class PathWithLastModified implements PathWithTerm {
 	private final Term term;
 
 	@SuppressWarnings("null")
-	public PathWithLastModified(final Path path) {
+	public PathWithLastModified(final String project, final Path path) {
+		this.project = project;
 		this.path = path;
 		this.file = path.toFile();
 		this.pathname = path.toString();
@@ -24,6 +26,12 @@ public class PathWithLastModified implements PathWithTerm {
 		// Data used when indexing
 		this.lastModified = this.file.lastModified();
 		this.term = PathWithTerm.getTerm(this.pathname);
+	}
+
+	@Override
+	public String getProject() {
+		// TODO Auto-generated method stub
+		return this.project;
 	}
 
 	@Override

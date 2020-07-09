@@ -46,6 +46,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -164,31 +165,59 @@ public class CASTLEIndexer {
 		}
 	}
 
-	private static Stream<Path> walkDirectories() {
+	private static Stream<PathWithLastModified> walkDirectories() {
 		// System.out.println("Walk directories: " + directories);
 
-		try {
-			return Files.walk(Activator.WORKSPACE_PATH).parallel().filter(CASTLESearchingSettings::shouldIndexFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			// Return empty stream if have error
-			return Stream.empty();
+		//		List<Path> directories = new ArrayList<>();
+		//		directories.add(Activator.WORKSPACE_PATH);
+
+		Stream<PathWithLastModified> result = Stream.empty();
+
+		// Add any external projects (not a child of the workspace path)
+		for (IProject project : Activator.WORKSPACE_ROOT.getProjects()) {
+			@NonNull
+			@SuppressWarnings("null")
+			String projectName = project.getName();
+			Path projectPath = project.getLocation().toFile().toPath();
+
+			Stream<PathWithLastModified> projectStream;
+			try {
+				projectStream = Files.walk(projectPath)
+						.filter(CASTLESearchingSettings::shouldIndexFile)
+						.map(p -> new PathWithLastModified(projectName, p));
+			} catch (IOException e) {
+				projectStream = Stream.empty();
+			}
+
+			result = Stream.concat(result, projectStream);
+
+			// https://stackoverflow.com/a/15169614
+			//			boolean isChild = projectPath.startsWith(Activator.WORKSPACE_PATH);
+
+			//			if (!isChild) {
+			//				System.out.println("External project: " + projectPath);
+			//				directories.add(projectPath);
+			//			}
 		}
 
-		// return DIRECTORIES
-		// // Multi-threaded
-		// .parallelStream()
-		// .flatMap(t -> {
-		// try {
-		// return Files.walk(t);
-		// } catch (IOException e1) {
-		// // TODO Auto-generated catch block
-		// e1.printStackTrace();
-		// // Return empty stream if have error
-		// return Stream.empty();
-		// }
-		// })
+		return result;
+
+		//		try (Stream<Path> stream = directories
+		//				// Multi-threaded
+		//				.parallelStream()
+		//				.flatMap(t -> {
+		//					try {
+		//						return Files.walk(t);
+		//					} catch (IOException e1) {
+		//						// Return empty stream if have error
+		//						return Stream.empty();
+		//					}
+		//				})) {
+		//
+		//			return stream.parallel()
+		//					.filter(CASTLESearchingSettings::shouldIndexFile)
+		//					.map();
+		//		}
 	}
 
 	private static boolean shouldIndex(final PathWithLastModified path, final Map<String, DocumentInfo> documents) {
@@ -330,7 +359,7 @@ public class CASTLEIndexer {
 		// (since it more likely to want to search more recently modified files)
 
 		@SuppressWarnings("null")
-		Stream<PathWithLastModified> stream = walkDirectories().map(PathWithLastModified::new)
+		Stream<PathWithLastModified> stream = walkDirectories()
 				.filter(p -> searcher == null ? true : shouldIndex(p, documents))
 				// Sort by last modified descending
 				// (since want to index recently modified files first
@@ -420,7 +449,7 @@ public class CASTLEIndexer {
 
 				writer.deleteDocuments(path.getTerm());
 
-				addDocument(writer, path.getPath(), path.getFile());
+				addDocument(writer, path);
 
 				int count = filesModifiedCount.addAndGet(1);
 
@@ -462,7 +491,7 @@ public class CASTLEIndexer {
 				}
 
 				if (removeWhenDone) {
-					castleIndexJob.removePath(path.getPath());
+					castleIndexJob.removePath(path);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -504,8 +533,9 @@ public class CASTLEIndexer {
 	 * @param path
 	 */
 	@NonNullByDefault
-	private static void addDocument(final IndexWriter indexWriter, final Path path, final File file)
+	private static void addDocument(final IndexWriter indexWriter, final PathWithTerm pathWithTerm)
 			throws IOException {
+		File file = pathWithTerm.getFile();
 		boolean isFile = file.isFile();
 
 		if (!isFile) {
@@ -514,10 +544,12 @@ public class CASTLEIndexer {
 		}
 
 		// Indicate which project in
-		Path relative = Activator.WORKSPACE_PATH.relativize(path);
+		//		Path relative = Activator.WORKSPACE_PATH.relativize(path);
 
-		String project = relative.getNameCount() > 0 ? relative.getName(0).toString() : "";
+		//		String project = relative.getNameCount() > 0 ? relative.getName(0).toString() : "";
 
+		String project = pathWithTerm.getProject();
+		Path path = pathWithTerm.getPath();
 		String pathString = path.toString();
 
 		@NonNull
@@ -538,7 +570,7 @@ public class CASTLEIndexer {
 		// https://stackoverflow.com/a/11168301
 		RangeMap<Integer, String> javaElements = TreeRangeMap.create();
 
-		IFile[] files = Activator.WORKSPACE.getRoot().findFilesForLocationURI(file.toURI());
+		IFile[] files = Activator.WORKSPACE_ROOT.findFilesForLocationURI(file.toURI());
 
 		if (files.length > 0) {
 			ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(files[0]);

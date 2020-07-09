@@ -1,7 +1,6 @@
 package info.codesaway.castlesearching.jobs;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +21,7 @@ import info.codesaway.castlesearching.util.PathWithTerm;
 public class CASTLEIndexJob extends Job {
 	private final CASTLESearchingView view;
 
-	private final Set<Path> indexPaths = ConcurrentHashMap.newKeySet();
+	private final Set<PathWithTerm> indexPaths = ConcurrentHashMap.newKeySet();
 	private final Set<Term> deleteDocuments = ConcurrentHashMap.newKeySet();
 	private boolean incrementalRebuildIndex = false;
 
@@ -64,7 +63,7 @@ public class CASTLEIndexJob extends Job {
 		this.view.setIndexCreated(isIndexCreated);
 	}
 
-	public void schedule(final boolean incrementalRebuildIndex, final Collection<Path> indexPaths,
+	public void schedule(final boolean incrementalRebuildIndex, final Collection<PathWithTerm> indexPaths,
 			final Collection<Term> deleteDocuments) {
 		// TODO: don't use parameter for anything yet
 		// (not sure if I need to, other than to give user heads up possibly)
@@ -85,7 +84,7 @@ public class CASTLEIndexJob extends Job {
 		this.schedule();
 	}
 
-	public void removePath(final Path path) {
+	public void removePath(final PathWithTerm path) {
 		// System.out.println("Indexed " + path);
 		this.indexPaths.remove(path);
 	}
@@ -128,9 +127,7 @@ public class CASTLEIndexJob extends Job {
 			// index isn't
 			// built yet or needs to be updated)
 			if (!this.indexPaths.isEmpty() || !this.deleteDocuments.isEmpty()) {
-				@SuppressWarnings("null")
-				Stream<PathWithTerm> stream = this.indexPaths.parallelStream().map(PathWithTerm::wrap);
-
+				Stream<PathWithTerm> stream = this.indexPaths.parallelStream();
 				Term[] deletes = this.deleteDocuments.isEmpty() ? EMPTY_TERM_ARRAY
 						: this.deleteDocuments.toArray(EMPTY_TERM_ARRAY);
 
