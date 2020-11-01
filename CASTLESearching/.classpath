@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/regexplus.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/indexer-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bex.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guava-29.0-jre.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
@@ -8,7 +11,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/lucene-core-8.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-queries-8.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-queryparser-8.3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/RegExPlus-0.4-beta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/SystemClipboard.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

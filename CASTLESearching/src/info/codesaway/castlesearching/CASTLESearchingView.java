@@ -88,9 +88,9 @@ import info.codesaway.castlesearching.indexer.java.CASTLEJavaIndexer;
 import info.codesaway.castlesearching.jobs.CASTLEIndexJob;
 import info.codesaway.castlesearching.jobs.CASTLESearchJob;
 import info.codesaway.castlesearching.searcher.CASTLESearcher;
-import info.codesaway.castlesearching.util.PathWithTerm;
 import info.codesaway.castlesearching.util.RegexUtilities;
 import info.codesaway.util.SystemClipboard;
+import info.codesaway.util.indexer.PathWithTerm;
 import info.codesaway.util.regex.Matcher;
 
 // Source: https://www.vogella.com/tutorials/EclipseJFaceTable/article.html

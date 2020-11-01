@@ -1,5 +1,8 @@
 package info.codesaway.castlesearching;
 
+import static info.codesaway.util.indexer.IndexerUtilities.addCamelCaseFilter;
+import static info.codesaway.util.indexer.IndexerUtilities.addUsualFilters;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,8 +10,9 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.custom.CustomAnalyzer;
-import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+
+import info.codesaway.util.indexer.IndexerUtilities;
 
 /**
  * CASTLE Searching is an Eclipse plugin written by Amy Brennan-Luna which uses Apache Lucene to index data for faster searching
@@ -57,27 +61,7 @@ public class CASTLESearching {
 		// (have options such as camelCase / PascalCase pattern)
 		// (this way, user can use if want or specify their own pattern)
 
-		String camelCaseRegex = "(?# Comment that is ignored when finding matches)"
-				+ "(?# Capture group 1, entire match, so can use as individual token when querying)"
-				+ "("
-				+ "(?# Lower-case letters such as 'test')"
-				+ "\\p{Ll}++"
-				+ "(?# Upper-case letter followed by lower case letters such as 'Test')"
-				+ "|\\p{Lu}\\p{Ll}++"
-				+ "(?# Multiple capital letters such as in 'SQLException' and 'CONSTANT_VALUE')"
-				+ "|(?:\\p{Lu}(?=\\p{Lu}|[^\\p{Lu}\\p{Ll}]|$))++"
-				+ "(?# End of capture group 1)"
-				+ ")";
-
-		builder.addTokenFilter(PatternCaptureGroupFilterFactory.class, "camelCase pattern", camelCaseRegex
-
-		// Number
-				, "number pattern", "(\\d++)"
-		// Underscore
-		// TODO: see if needed and find example where it has a noticeable benefit
-		//				, "underscore pattern", "([A-Za-z0-9]++)(?=_\\b)"
-		);
-		//		}
+		addCamelCaseFilter(builder);
 
 		// https://lucene.apache.org/solr/guide/6_6/filter-descriptions.html#FilterDescriptions-SynonymGraphFilter
 		if (step != LuceneStep.INDEX) {
@@ -90,33 +74,13 @@ public class CASTLESearching {
 			builder.addTokenFilter("synonymGraph", "synonyms", "synonyms.txt", "ignoreCase", "true");
 		}
 
-		builder.addTokenFilter("englishPossessive").addTokenFilter("lowercase");
-
-		// Use to preserve original token, before stemming
-		// (helps improve wildcard matching and fuzzy searching)
-		// https://lucene.apache.org/solr/guide/6_6/language-analysis.html#LanguageAnalysis-KeywordRepeatFilterFactory
-		builder.addTokenFilter("keywordRepeat");
-
-		// Only remove stop words when index
-		// Don't remove stop words
-		// Keep them when query, since "this" is a stop word and is a keyword in Java (so may want to search with it)
-		//		if (step == LuceneStep.INDEX) {
-		//			builder.addTokenFilter("stop");
-		//		}
-
-		builder.addTokenFilter("porterstem")
-				// Added since due to synonyms and stemmer, may lead to duplicate tokens in same position
-				// (added to reduce index space and possibly improve performance)
-				.addTokenFilter("removeDuplicates");
-
-		Analyzer analyzer = builder.build();
+		addUsualFilters(builder);
 
 		Map<String, Analyzer> analyzerMap = new HashMap<>();
 		// Don't want to have stop words for "type" (otherwise filters out "if" and "for")
 		// TODO: allow specifying different analyzers for different fields
 		analyzerMap.put("type", new StandardAnalyzer(CharArraySet.EMPTY_SET));
 
-		PerFieldAnalyzerWrapper wrapper = new PerFieldAnalyzerWrapper(analyzer, analyzerMap);
-		return wrapper;
+		return IndexerUtilities.createAnalyzer(builder, analyzerMap);
 	}
 }

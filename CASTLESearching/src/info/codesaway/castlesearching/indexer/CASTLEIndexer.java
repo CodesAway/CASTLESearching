@@ -1,5 +1,7 @@
 package info.codesaway.castlesearching.indexer;
 
+import static info.codesaway.util.indexer.IndexerUtilities.createMetaDocument;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.BinaryDocValuesField;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -44,7 +44,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.BytesRef;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -77,8 +76,8 @@ import info.codesaway.castlesearching.indexer.java.JavaIndexerReturn;
 import info.codesaway.castlesearching.jobs.CASTLEIndexJob;
 import info.codesaway.castlesearching.util.DateUtilities;
 import info.codesaway.castlesearching.util.JDTUtilities;
-import info.codesaway.castlesearching.util.PathWithLastModified;
-import info.codesaway.castlesearching.util.PathWithTerm;
+import info.codesaway.util.indexer.PathWithLastModified;
+import info.codesaway.util.indexer.PathWithTerm;
 import info.codesaway.util.regex.Matcher;
 
 public class CASTLEIndexer {
@@ -715,29 +714,8 @@ public class CASTLEIndexer {
 		// (in this case, the document would not show as indexed in full and
 		// would be reindexed)
 		// TODO: should also delete documents when corresponding file is deleted
-		Document metaDocument = new Document();
-
-		// Indicate this is a meta document, so it can be ignored when searching
-		metaDocument.add(new StringField("metadocument", "meta", Field.Store.NO));
-
-		metaDocument.add(new StringField(FULL_PATH_FIELD, pathString, Field.Store.YES));
-
-		// Put pathname as a docvalue, so can quickly retrieve
-		// (used to determine which files were modified when incremental
-		// indexing)
-		metaDocument.add(new BinaryDocValuesField(PATHNAME_FIELD, new BytesRef(pathString)));
-
-		// Store data to help know when to reindex
-		metaDocument.add(new NumericDocValuesField("fileLastModified", fileLastModified));
-
-		// Track the version of the code that was used to write the document
-		// (this way, can incrementally update files as the logic changes)
-		// (it will essentially be a full rebuild of the index)
-		// TODO: allow different document version for each indexer
-		// (index based on files listed which have indexers)
-		// (store attribution for version on the indexer instead of on the
-		// parent indexers XML field)
-		metaDocument.add(new NumericDocValuesField("documentVersion", CASTLESearchingSettings.DOCUMENT_VERSION));
+		Document metaDocument = createMetaDocument(pathString, fileLastModified,
+				CASTLESearchingSettings.DOCUMENT_VERSION);
 
 		if (!indexWriter.isOpen()) {
 			return;

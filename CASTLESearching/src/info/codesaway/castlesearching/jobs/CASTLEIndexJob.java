@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 
 import info.codesaway.castlesearching.CASTLESearchingView;
 import info.codesaway.castlesearching.indexer.CASTLEIndexer;
-import info.codesaway.castlesearching.util.PathWithTerm;
+import info.codesaway.util.indexer.PathWithTerm;
 
 public class CASTLEIndexJob extends Job {
 	private final CASTLESearchingView view;
