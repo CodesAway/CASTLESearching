@@ -13,6 +13,7 @@ import org.apache.lucene.analysis.custom.CustomAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import info.codesaway.util.indexer.IndexerUtilities;
+import info.codesaway.util.indexer.LuceneStep;
 
 /**
  * CASTLE Searching is an Eclipse plugin written by Amy Brennan-Luna which uses Apache Lucene to index data for faster searching

@@ -38,8 +38,8 @@ import info.codesaway.castlesearching.CASTLESearchResultEntry;
 import info.codesaway.castlesearching.CASTLESearching;
 import info.codesaway.castlesearching.CASTLESearchingSettings;
 import info.codesaway.castlesearching.CASTLESearchingView;
-import info.codesaway.castlesearching.LuceneStep;
 import info.codesaway.castlesearching.indexer.CASTLEIndexer;
+import info.codesaway.util.indexer.LuceneStep;
 
 public class CASTLESearchJob extends Job {
 
